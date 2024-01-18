@@ -48,22 +48,60 @@ const FormModel = mongoose.model('login', formSchema);
 app.use(express.json());
 
 // POST route to handle form creation
-app.post('/submit-form', async (req, res) => {
+app.get('/get-forms', async (req, res) => {
   try {
-    // Create a new form entry using the Mongoose model
-    const newFormEntry = new FormModel(req.body);
-
-    // Save the entry to the database
-    await newFormEntry.save();
-
-    // Send a success response
-    res.status(200).json({ message: 'Form submitted successfully' });
+    const forms = await FormModel.find();
+    res.status(200).json(forms);
   } catch (error) {
-    console.error('Error submitting form:', error);
+    console.error('Error fetching forms:', error);
     res.status(500).json({ error: 'Internal server error' });
   }
 });
 
+// GET route to retrieve a specific form entry by ID
+app.get('/get-form/:id', async (req, res) => {
+  const formId = req.params.id;
+  try {
+    const form = await FormModel.findById(formId);
+    if (!form) {
+      return res.status(404).json({ error: 'Form not found' });
+    }
+    res.status(200).json(form);
+  } catch (error) {
+    console.error('Error fetching form:', error);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+});
+
+// PUT route to update a specific form entry by ID
+app.put('/update-form/:id', async (req, res) => {
+  const formId = req.params.id;
+  try {
+    const updatedForm = await FormModel.findByIdAndUpdate(formId, req.body, { new: true });
+    if (!updatedForm) {
+      return res.status(404).json({ error: 'Form not found' });
+    }
+    res.status(200).json({ message: 'Form updated successfully', form: updatedForm });
+  } catch (error) {
+    console.error('Error updating form:', error);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+});
+
+// DELETE route to delete a specific form entry by ID
+app.delete('/delete-form/:id', async (req, res) => {
+  const formId = req.params.id;
+  try {
+    const deletedForm = await FormModel.findByIdAndDelete(formId);
+    if (!deletedForm) {
+      return res.status(404).json({ error: 'Form not found' });
+    }
+    res.status(200).json({ message: 'Form deleted successfully', form: deletedForm });
+  } catch (error) {
+    console.error('Error deleting form:', error);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+});
 // Start the Express server
 app.listen(port, () => {
   console.log(`Server is running on port ${port}`);
