@@ -1,22 +1,22 @@
-// Import necessary modules and packages
+
 const express = require('express');
 const mongoose = require('mongoose');
 const cors = require('cors');
-require('dotenv').config(); // Load environment variables from .env file
+require('dotenv').config(); 
 
-// Create an Express app
+
 const app = express();
 
-// Enable CORS
+
 app.use(cors());
 const corsOptions = {
-  origin: 'http://localhost:3000', // Replace with your React app's origin
+  origin: 'http://localhost:3000', 
   optionsSuccessStatus: 200,
 };
 app.use(cors(corsOptions));
 
-// Connect to MongoDB Atlas using environment variable
-const atlasConnectionUri = process.env.MONGODB_URI; // Set MONGODB_URI in your .env file
+
+const atlasConnectionUri = process.env.MONGODB_URI; 
 mongoose.connect(atlasConnectionUri, { useNewUrlParser: true, useUnifiedTopology: true })
   .then(() => {
     console.log('Connected to MongoDB Atlas');
@@ -25,7 +25,7 @@ mongoose.connect(atlasConnectionUri, { useNewUrlParser: true, useUnifiedTopology
     console.error('Error connecting to MongoDB Atlas:', error);
   });
 
-// Define Mongoose schema for vendor input
+
 const vendorSchema = new mongoose.Schema({
   vendorName: {
     type: String,
@@ -65,10 +65,8 @@ const vendorSchema = new mongoose.Schema({
 
 const VendorModel = mongoose.model('Vendor', vendorSchema);
 
-// Middleware to parse JSON in the request body
 app.use(express.json());
 
-// GET route to retrieve all vendor entries
 app.get('/get-vendors', async (req, res) => {
   try {
     const vendors = await VendorModel.find();
@@ -79,7 +77,6 @@ app.get('/get-vendors', async (req, res) => {
   }
 });
 
-// POST route to handle vendor creation
 app.post('/create-vendor', async (req, res) => {
   try {
     const newVendorEntry = new VendorModel(req.body);
@@ -91,7 +88,6 @@ app.post('/create-vendor', async (req, res) => {
   }
 });
 
-// GET route to retrieve a specific vendor entry by ID
 app.get('/get-vendor/:id', async (req, res) => {
   const vendorId = req.params.id;
   try {
