@@ -2,6 +2,7 @@
 const express = require('express');
 const mongoose = require('mongoose');
 const cors = require('cors');
+require('dotenv').config(); // Load environment variables from .env file
 
 // Create an Express app
 const app = express();
@@ -14,8 +15,8 @@ const corsOptions = {
 };
 app.use(cors(corsOptions));
 
-// Connect to MongoDB Atlas
-const atlasConnectionUri = 'mongodb+srv://prathappoojari607:3WrebKuwJ1OIS5KU@cluster0.qhn2yup.mongodb.net/jsp?retryWrites=true&w=majority';
+// Connect to MongoDB Atlas using environment variable
+const atlasConnectionUri = process.env.MONGODB_URI; // Set MONGODB_URI in your .env file
 mongoose.connect(atlasConnectionUri, { useNewUrlParser: true, useUnifiedTopology: true })
   .then(() => {
     console.log('Connected to MongoDB Atlas');
@@ -64,7 +65,7 @@ const vendorSchema = new mongoose.Schema({
 
 const VendorModel = mongoose.model('Vendor', vendorSchema);
 
-// Middleware to parse JS/ON in the request body
+// Middleware to parse JSON in the request body
 app.use(express.json());
 
 // GET route to retrieve all vendor entries
@@ -136,7 +137,7 @@ app.delete('/delete-vendor/:id', async (req, res) => {
 });
 
 // Start the Express server
-const port = 9000;
+const port = process.env.PORT || 9000; // Use the PORT environment variable or default to 9000
 app.listen(port, () => {
   console.log(`Server is running on port ${port}`);
 });
